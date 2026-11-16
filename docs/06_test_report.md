@@ -1,4 +1,4 @@
-# 06. Test Report (15-52 Verification Results)
+# 06. Test Report
 
 ## Environment
 <!-- Commit hash, OS, ROS 2 distro, map and mission settings, how the tests were run. -->
@@ -8,17 +8,18 @@
 |---|---|---|---|---|
 
 ## Results
-Raw data (03-50): gtest logs, rosbag files, evaluation logs, and driving videos in `results/<test case ID>/`.
+Raw data: gtest logs, rosbag files, evaluation logs, and driving videos in `results/<test case ID>/`.
+Each result is the same as the `Result` in `05_test_specification.md`.
 
 | ID | Result (Pass / Fail / Not executed) | Evidence (path) | Notes |
 |---|---|---|---|
 
-## Anomalies (SUP.9 Problem Resolution)
+## Anomalies
 One row per failure. Severity: Critical / Major / Minor. Status: Open / In progress / Closed.
 
 | ID | Test Case | SWR | Severity | Description | Root Cause | Action | Status |
 |---|---|---|---|---|---|---|---|
 
-## Review (13-52 Communication Evidence)
+## Review
 | Release (tag) | Pull Request | Reviewed by | Shared on |
 |---|---|---|---|

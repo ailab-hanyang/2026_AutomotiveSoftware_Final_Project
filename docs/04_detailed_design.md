@@ -1,7 +1,8 @@
 # 04. Detailed Design (SWE.3)
 
-AI agents may draft this document (04-05). The team reviews it before merging.
-Each unit (11-05) is a function in `src/` with `// @req SWR-xxx` on the line above it.
+AI agents may draft this document. The team reviews it before merging.
+Each unit is a function in `src/` with `// @req SWR-xxx` on the line above it.
+Copy the `COMP-01` section below for each component in `03_sw_architecture.md`.
 
 ## COMP-01: <name>
 

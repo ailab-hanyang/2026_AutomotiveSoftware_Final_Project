@@ -43,10 +43,9 @@ RESULTS = {"Pass", "Fail", "Not executed"}
 # (file, table) -> fixed header; the first column holds the IDs of that table
 TABLES = {
     "sys": ("01_system_requirements.md",
-            ["ID", 'Requirement ("The vehicle shall …")', "Source (Customer / Team)", "Verification Method",
-             "Acceptance Criteria"]),
+            ["ID", 'Requirement ("The vehicle shall …")', "Verification Method", "Acceptance Criteria"]),
     "swr": ("02_sw_requirements.md",
-            ["ID", "Requirement (17-00)", "Source (SYS-ID)", "Priority", "Verification Method", "Acceptance Criteria"]),
+            ["ID", "Requirement", "Source (SYS-ID)", "Priority", "Verification Method", "Acceptance Criteria"]),
     "comp": ("03_sw_architecture.md",
              ["ID", "Name", "Role", "Units (functions)", "Input", "Output", "Allocated SWR"]),
     "if": ("03_sw_architecture.md",
