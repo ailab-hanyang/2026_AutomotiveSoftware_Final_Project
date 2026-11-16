@@ -10,7 +10,7 @@ AUE4039 Automotive Software, Final Project (2026 Fall)
 <!-- One paragraph: what the function does and in which situation. Details in docs/00_overview.md. -->
 
 ## Build and Run
-Requires Ubuntu 22.04 (x86_64, or aarch64 in a VM on Apple Silicon Mac) and ROS 2 Humble.
+Requires Ubuntu 22.04 on x86_64 (Intel/AMD PC or WSL2) and ROS 2 Humble. Apple Silicon Macs are not supported.
 ```bash
 source /opt/ros/humble/setup.bash
 colcon build

@@ -56,14 +56,12 @@ add_executable(mission_manager
 # Link libraries and dependencies
 ################################################################################
 
-# The prebuilt libraries come per CPU architecture: <name>.x86_64.a (Intel/AMD PCs, WSL2)
-# and <name>.aarch64.a (Ubuntu VMs on Apple Silicon Macs).
+# The prebuilt libraries are built for x86_64 only: <name>.x86_64.a (Intel/AMD PCs, WSL2).
+# Apple Silicon Macs (aarch64) are not supported.
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64)$")
   set(ALG_ARCH x86_64)
-elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|ARM64)$")
-  set(ALG_ARCH aarch64)
 else()
-  message(FATAL_ERROR "No prebuilt algorithm library for ${CMAKE_SYSTEM_PROCESSOR}. Use Ubuntu 22.04 on x86_64 or aarch64.")
+  message(FATAL_ERROR "No prebuilt algorithm library for ${CMAKE_SYSTEM_PROCESSOR}. Only x86_64 (Intel/AMD PC or WSL2) is supported; Apple Silicon Macs are not supported.")
 endif()
 
 # Define an algorithm library target for the pre-built algorithm.a

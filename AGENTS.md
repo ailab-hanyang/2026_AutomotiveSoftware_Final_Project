@@ -12,7 +12,7 @@ Target: Automotive SPICE (PAM 4.1) capability Level 1 for SWE.1 to SWE.6: every 
 - Every PR adds 3 to 5 lines to `docs/ai_usage_log.md`: what was delegated and which errors were found in the AI output.
 
 ## Environment
-- Ubuntu 22.04 (x86_64, or aarch64 in a VM on Apple Silicon Mac), ROS 2 Humble, C++14, colcon.
+- Ubuntu 22.04 on x86_64 (Intel/AMD PC or WSL2), ROS 2 Humble, C++14, colcon. Apple Silicon Macs are not supported.
 - Build from the repository root:
   ```bash
   source /opt/ros/humble/setup.bash
@@ -42,7 +42,7 @@ results/                      verification data per test case (results/TC-S-001/
 tools/check_traceability.py   format and traceability check
 ```
 - The `.a` files in the provided packages are prebuilt libraries. Treat them as a black box: do not modify, replace, or decompile them.
-  Each comes in two builds, `<name>.x86_64.a` and `<name>.aarch64.a` (Ubuntu VM on Apple Silicon Mac); CMake picks the one for the current CPU.
+  They are built for x86_64 only (`<name>.x86_64.a`).
 - Tests must belong to an ament_cmake package so that `colcon test` finds them (colcon scans the whole repository, including `test/`).
 
 ## Interfaces of the provided simulator (namespace `ego`)
