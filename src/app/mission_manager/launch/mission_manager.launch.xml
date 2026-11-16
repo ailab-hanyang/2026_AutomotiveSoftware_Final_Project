@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="ns1" default="ego"/>
+  
+  <!-- Loop Rate -->   
+  <arg name="loop_rate_scenario" default="100.0"/>
+
+  <!-- Map (resources/csv/<map>/) and mission switches; ./launch.sh sets them -->
+  <arg name="map" default="easy"/>
+  <arg name="ice" default="true"/>
+  <arg name="slope" default="true"/>
+  <arg name="school_zone" default="true"/>
+  <arg name="scc" default="true"/>
+  <arg name="merge" default="true"/>
+  <arg name="parking" default="true"/>
+
+  <!-- Launch mission manager node -->
+  <node pkg="mission_manager" exec="mission_manager" name="mission_manager_node" namespace="$(var ns1)" output="screen">
+    <param name="mission_manager/ns" value="$(var ns1)"/>
+    <param name="mission_manager/loop_rate_hz" value="$(var loop_rate_scenario)"/>
+    <param name="mission_manager/map" value="$(var map)"/>
+    <param name="mission_manager/ice" value="$(var ice)"/>
+    <param name="mission_manager/slope" value="$(var slope)"/>
+    <param name="mission_manager/school_zone" value="$(var school_zone)"/>
+    <param name="mission_manager/scc" value="$(var scc)"/>
+    <param name="mission_manager/merge" value="$(var merge)"/>
+    <param name="mission_manager/parking" value="$(var parking)"/>
+  </node>
+
+</launch>

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Declare arguments as strings where appropriate -->
+  <arg name="loop_rate" default="50.0"/>
+  <arg name="lane_id" default="'1'" />
+
+  <!-- Map (resources/csv/<map>/) and parking switch; ./launch.sh sets them.
+       The time limit, parking slots, and lane departure threshold (4.5 m) are fixed. -->
+  <arg name="map" default="easy"/>
+  <arg name="parking" default="true"/>
+
+  <!-- Launch evaluation node -->
+  <node pkg="evaluation" exec="evaluation" name="evaluation_node" output="screen">
+    <param name="evaluation/loop_rate_hz" value="$(var loop_rate)"/>
+    <param name="evaluation/lane_id" value="$(var lane_id)"/>
+    <param name="evaluation/map" value="$(var map)"/>
+    <param name="evaluation/parking" value="$(var parking)"/>
+  </node>
+</launch>

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="ns1" default="ego"/>
+
+  <!-- Loop Rate -->   
+  <arg name="loop_rate_vehicle" default="100.0"/>
+  <arg name="loop_rate_lane_detection" default="30.0"/>
+  <arg name="loop_rate_display" default="100.0"/>
+
+  <!-- Map (resources/csv/<map>/) and lane loss switch; ./launch.sh sets them.
+       The ROI box, road grades, and start pose are fixed. -->
+  <arg name="map" default="easy"/>
+  <arg name="lane_loss" default="true"/>
+
+  <group>
+    <node pkg="simulator" exec="vehicle" name="vehicle" namespace="$(var ns1)" output="screen">
+      <param name="vehicle/ns" value="$(var ns1)"/>
+      <param name="vehicle/loop_rate_hz" value="$(var loop_rate_vehicle)"/>
+    </node>
+    
+    <node pkg="simulator" exec="lane_detection" name="lane_detection" namespace="$(var ns1)" output="screen">
+      <param name="lane_detection/ns" value="$(var ns1)"/>
+      <param name="lane_detection/loop_rate_hz" value="$(var loop_rate_lane_detection)"/>
+      <param name="lane_detection/map" value="$(var map)"/>
+      <param name="lane_detection/lane_loss" value="$(var lane_loss)"/>
+    </node>
+
+    <node pkg="simulator" exec="display" name="display" namespace="$(var ns1)" output="screen">
+      <param name="display/ns" value="$(var ns1)"/>
+      <param name="display/loop_rate_hz" value="$(var loop_rate_display)"/>
+    </node>
+  </group>
+
+  <node pkg="rviz2" exec="rviz2" name="rviz2" args="-d $(find-pkg-share simulator)/../../../../resources/rviz/ros2_practice.rviz"/>
+</launch>
