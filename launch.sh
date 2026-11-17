@@ -1,10 +1,12 @@
 #!/bin/bash
 # Opens 4 terminals: simulator, mission_manager, evaluation, autonomous_driving.
 #
-# usage: ./launch.sh [map]
-#   map: easy (default), normal, or hard (resources/csv/<map>/)
-#
-# Missions: set each switch to true or false below. Positions and parameters of the
+# usage: ./launch.sh  (run from the repository root)
+
+# Map: easy, normal, or hard. Lane files are in resources/csv/<map>/.
+MAP=easy
+
+# Missions: set each switch to true or false. Positions and parameters of the
 # missions are fixed per map; only these switches can be changed.
 ICE=true            # icy region            Mission.road_condition = "Ice"
 SLOPE=true          # uphill and downhill   Mission.road_slope = "Up" / "Down"
@@ -14,7 +16,6 @@ MERGE=true          # lane closure, merge   Mission.objects (open lane: left or 
 PARKING=true        # park at the track end Mission.parking
 LANE_LOSS=true      # lane markings missing in some sections (lane_points)
 
-MAP=${1:-easy}
 if [ ! -d "resources/csv/$MAP" ]; then
     echo "unknown map '$MAP' (use easy, normal, or hard; run from the repository root)" >&2
     exit 1

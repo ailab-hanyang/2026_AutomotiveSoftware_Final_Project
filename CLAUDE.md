@@ -18,9 +18,9 @@ Target: Automotive SPICE (PAM 4.1) capability Level 1 for SWE.1 to SWE.6: every 
   source /opt/ros/humble/setup.bash
   colcon build
   ```
-- Run (opens 4 terminals with `terminator`): `./launch.sh [easy|normal|hard]` (default `easy`)
+- Run (opens 4 terminals with `terminator`): `./launch.sh`
   The order is simulator, mission_manager, evaluation, autonomous_driving.
-  Missions are switched on or off at the top of `launch.sh` (see "Maps and missions").
+  The map (`MAP`: `easy`, `normal`, `hard`) and the mission switches are set at the top of `launch.sh` (see "Maps and missions").
 - Test: `colcon test && colcon test-result --verbose`
 - Format and traceability check: `python3 tools/check_traceability.py`
   Run it before every commit.

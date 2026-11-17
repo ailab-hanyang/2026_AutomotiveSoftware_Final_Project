@@ -14,7 +14,7 @@ Requires Ubuntu 22.04 on x86_64 (Intel/AMD PC or WSL2) and ROS 2 Humble. Apple S
 ```bash
 source /opt/ros/humble/setup.bash
 colcon build
-./launch.sh normal   # map: easy (default), normal, hard; mission switches at the top of launch.sh
+./launch.sh          # map (MAP: easy, normal, hard) and mission switches at the top of launch.sh
 ```
 
 ## Test
