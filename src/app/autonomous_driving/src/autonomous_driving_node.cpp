@@ -45,8 +45,6 @@ AutonomousDriving::AutonomousDriving(const std::string &node_name, const rclcpp:
         "/manual_input", qos_profile, std::bind(&AutonomousDriving::CallbackManualInput, this, std::placeholders::_1));
     s_vehicle_state_ = this->create_subscription<ad_msgs::msg::VehicleState>(
         "vehicle_state", qos_profile, std::bind(&AutonomousDriving::CallbackVehicleState, this, std::placeholders::_1));
-    s_lane_points_array_ = this->create_subscription<ad_msgs::msg::LanePointDataArray>(
-        "lane_points_array", qos_profile, std::bind(&AutonomousDriving::CallbackLanePointsArray, this, std::placeholders::_1));
     s_lane_points_ = this->create_subscription<ad_msgs::msg::LanePointData>(
         "lane_points", qos_profile, std::bind(&AutonomousDriving::CallbackLanePoints, this, std::placeholders::_1));
     s_mission_ = this->create_subscription<ad_msgs::msg::Mission>(
@@ -103,11 +101,6 @@ void AutonomousDriving::Run() {
         return;
     }
 
-    if (b_is_lane_points_array_ == false) {
-        RCLCPP_ERROR_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Wait for Lane Points Array ...");
-        return;
-    }
-
     if (b_is_mission_ == false) {
         RCLCPP_ERROR_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Wait for Mission ...");
         return;
@@ -128,11 +121,6 @@ void AutonomousDriving::Run() {
     interface::Lane lane_points; {
         std::lock_guard<std::mutex> lock(mutex_lane_points_);
         lane_points = i_lane_points_;
-    }
-
-    interface::Lanes lane_points_array; {
-        std::lock_guard<std::mutex> lock(mutex_lane_points_array_);
-        lane_points_array = i_lane_points_array_;
     }
 
     interface::Mission mission; {

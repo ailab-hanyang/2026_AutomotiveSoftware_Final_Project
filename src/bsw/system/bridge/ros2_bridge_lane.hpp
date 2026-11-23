@@ -31,27 +31,6 @@ namespace ros2_bridge {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
     // Get functions
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
-    inline interface::Lanes GetLanePointsArray(const ad_msgs::msg::LanePointDataArray& msg) {
-        interface::Lanes lane_points_array;
-        lane_points_array.frame_id = msg.frame_id;
-        lane_points_array.id = msg.id;
-
-        for (const auto& lane : msg.lane) {
-            interface::Lane lane_points;
-            lane_points.frame_id = lane.frame_id;
-            lane_points.id = lane.id;
-
-            for (const auto& point : lane.point) {
-                interface::Point2D lanePoint;
-                lanePoint.x = point.x;
-                lanePoint.y = point.y;
-                lane_points.point.push_back(lanePoint);
-            }
-            lane_points_array.lane.push_back(lane_points);
-        }
-
-        return lane_points_array;
-    }
     inline interface::Lane GetLanePoints(const ad_msgs::msg::LanePointData& msg) {
         interface::Lane lane_points;
         lane_points.frame_id = msg.frame_id;
@@ -129,29 +108,6 @@ namespace ros2_bridge {
             lanepoints.x = point.x;
             lanepoints.y = point.y;
             msg.point.push_back(lanepoints);
-        }
-
-        return msg;
-    }
-
-    inline ad_msgs::msg::LanePointDataArray UpdateLanePointsArray(const interface::Lanes& roi_lanes,
-                                                                  const std::string vehicle_namespace) {
-        ad_msgs::msg::LanePointDataArray msg;
-        msg.frame_id = vehicle_namespace + "/body";
-        msg.id = roi_lanes.id;
-
-        for (const auto& roi_lane : roi_lanes.lane) {
-            ad_msgs::msg::LanePointData lane_points;
-            lane_points.frame_id = vehicle_namespace + "/body";
-            lane_points.id = roi_lane.id;
-
-            for (const auto& point : roi_lane.point) {
-                geometry_msgs::msg::Point lanepoints;
-                lanepoints.x = point.x;
-                lanepoints.y = point.y;
-                lane_points.point.push_back(lanepoints);
-            }
-            msg.lane.push_back(lane_points);
         }
 
         return msg;
