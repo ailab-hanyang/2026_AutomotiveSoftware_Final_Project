@@ -2,6 +2,21 @@
 
 AUE4039 Automotive Software, Final Project (2026 Fall)
 
+> **Worked example (replace it with your own function).** The template comes filled in with the lane keeping example (LKS)
+> of Lecture 07, on the map easy only. Read it, then replace it with your function: your IDs, documents, nodes, tests, and results.
+> Keep the table headers, rules, and folders (`CLAUDE.md`).
+>
+> | Where | What the example shows |
+> |---|---|
+> | `docs/` | every document filled in for LKS, with the results of every test case |
+> | `src/app/autonomous_driving/` | two nodes added to the package: `perception` (COMP-01) and `control` (COMP-02), each with simple units in `<node>_algorithm.cpp` (`// @req`); the provided node `autonomous_driving` is kept for manual driving |
+> | `launch/autonomous_driving.launch.xml` | starts perception and control; `manual:=true` starts the provided node instead |
+> | `src/rte/msg/ad_msgs/msg/ComputationTime.msg` | a message added by the team (IF-05, IF-06); existing messages stay unchanged |
+> | `test/unit/`, `test/integration/` | gtest (TC-U-001 to TC-U-004) and launch_testing (TC-I-001 to TC-I-003) |
+> | `CMakeLists.txt`, `package.xml` of autonomous_driving | how the nodes and the tests are registered |
+> | `results/` | evidence of every test case: test output, evaluation results, rosbags |
+> | `tools/save_evaluation.py` | helper that saves the evaluation result of one scenario run |
+
 ## Team
 | Student ID | Name | Role |
 |---|---|---|

@@ -51,6 +51,9 @@ set(MSG_FILES
     msg/LanePointData.msg
     msg/LanePointDataArray.msg
     msg/PolyfitLaneDataArray.msg
+
+    # Team: computation time of a node (SWR-004)
+    msg/ComputationTime.msg
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
