@@ -1,0 +1,9 @@
+test case: TC-U-002
+command: colcon test && colcon test-result --verbose (repository root)
+run: 2026-11-23 23:09, git commit: 2509c63
+
+ok  test_control_algorithm     TC_U_002_BoundaryValue
+ok  test_control_algorithm     TC_U_002_NegativeTest
+ok  test_control_algorithm     TC_U_002_NormalCase
+
+Summary: 19 tests, 0 errors, 0 failures, 0 skipped

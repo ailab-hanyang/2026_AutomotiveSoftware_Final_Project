@@ -1,0 +1,7 @@
+test case: TC-I-001
+command: colcon test && colcon test-result --verbose (repository root)
+run: 2026-11-23 23:09, git commit: 2509c63
+
+ok  test_perception_control    test_tc_i_001_lane_center_to_command
+
+Summary: 19 tests, 0 errors, 0 failures, 0 skipped

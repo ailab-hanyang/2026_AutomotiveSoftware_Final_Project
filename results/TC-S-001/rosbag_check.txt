@@ -1,0 +1,24 @@
+test case: TC-S-001 (rosbag criteria: SWR-002, SWR-003, SWR-004)
+command: python3 test/scenario/check_rosbag.py results/TC-S-001/rosbag/run_<n> (repository root)
+run: 2026-11-23 23:20, git commit of the runs: 2509c63
+
+run_1
+speed from 10.0 s after the start to the track end (88.6 s): min 9.89 m/s, max 9.89 m/s -> Pass
+timing perception: 9120 periods of 10.0 ms, longest 6.213 ms, 0 over the period -> Pass
+timing control: 9120 periods of 10.0 ms, longest 3.167 ms, 0 over the period -> Pass
+command: 9120 vehicle commands, 0 with accel or brake outside [0, 1] -> Pass
+TC-S-001 rosbag criteria: Pass
+
+run_2
+speed from 10.0 s after the start to the track end (88.7 s): min 9.89 m/s, max 9.89 m/s -> Pass
+timing perception: 8914 periods of 10.0 ms, longest 5.078 ms, 0 over the period -> Pass
+timing control: 9109 periods of 10.0 ms, longest 1.268 ms, 0 over the period -> Pass
+command: 9109 vehicle commands, 0 with accel or brake outside [0, 1] -> Pass
+TC-S-001 rosbag criteria: Pass
+
+run_3
+speed from 10.0 s after the start to the track end (88.6 s): min 9.89 m/s, max 9.89 m/s -> Pass
+timing perception: 9467 periods of 10.0 ms, longest 8.264 ms, 0 over the period -> Pass
+timing control: 9374 periods of 10.0 ms, longest 7.436 ms, 0 over the period -> Pass
+command: 9374 vehicle commands, 0 with accel or brake outside [0, 1] -> Pass
+TC-S-001 rosbag criteria: Pass
