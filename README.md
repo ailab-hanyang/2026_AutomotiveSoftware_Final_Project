@@ -12,7 +12,7 @@ AUE4039 Automotive Software, Final Project (2026 Fall)
 > | `src/app/autonomous_driving/` | two nodes added to the package: `perception` (COMP-01) and `control` (COMP-02), each with simple units in `<node>_algorithm.cpp` (`// @req`); the provided node `autonomous_driving` is kept for manual driving |
 > | `launch/autonomous_driving.launch.xml` | starts perception and control; `manual:=true` starts the provided node instead |
 > | `src/rte/msg/ad_msgs/msg/ComputationTime.msg` | a message added by the team (IF-05, IF-06); existing messages stay unchanged |
-> | `test/unit/`, `test/integration/` | gtest (TC-U-001 to TC-U-004) and launch_testing (TC-I-001 to TC-I-003) |
+> | `test/unit/`, `test/integration/`, `test/scenario/` | unit tests TC-U-001 to TC-U-004 (gtest), integration tests TC-I-001 to TC-I-004 (launch_testing), software tests TC-S-001 (simulator, `check_rosbag.py`) and TC-S-002 (launch_testing) |
 > | `CMakeLists.txt`, `package.xml` of autonomous_driving | how the nodes and the tests are registered |
 > | `results/` | evidence of every test case: test output, evaluation results, rosbags |
 > | `tools/save_evaluation.py` | helper that saves the evaluation result of one scenario run |

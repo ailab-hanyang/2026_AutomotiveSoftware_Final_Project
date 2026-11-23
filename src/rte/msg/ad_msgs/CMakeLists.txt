@@ -52,7 +52,7 @@ set(MSG_FILES
     msg/LanePointDataArray.msg
     msg/PolyfitLaneDataArray.msg
 
-    # Team: computation time of a node (SWR-004)
+    # Team: computation time of a node (SWR-003)
     msg/ComputationTime.msg
 )
 
