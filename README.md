@@ -1,28 +1,21 @@
-# Team XX: <Project Title>
+# Team XX: Lane Keeping on the Map Easy (Example)
 
 AUE4039 Automotive Software, Final Project (2026 Fall)
 
-> **Worked example (replace it with your own function).** The template comes filled in with the lane keeping example (LKS)
-> of Lecture 07, on the map easy only. Read it, then replace it with your function: your IDs, documents, nodes, tests, and results.
-> Keep the table headers, rules, and folders (`CLAUDE.md`).
->
-> | Where | What the example shows |
-> |---|---|
-> | `docs/` | every document filled in for LKS, with the results of every test case |
-> | `src/app/autonomous_driving/` | two nodes added to the package: `perception` (COMP-01) and `control` (COMP-02), each with simple units in `<node>_algorithm.cpp` (`// @req`); the provided node `autonomous_driving` is kept for manual driving |
-> | `launch/autonomous_driving.launch.xml` | starts perception and control; `manual:=true` starts the provided node instead |
-> | `src/rte/msg/ad_msgs/msg/ComputationTime.msg` | a message added by the team (IF-05, IF-06); existing messages stay unchanged |
-> | `test/unit/`, `test/integration/`, `test/scenario/` | unit tests TC-U-001 to TC-U-004 (gtest), integration tests TC-I-001 to TC-I-004 (launch_testing), software tests TC-S-001 (simulator, `check_rosbag.py`) and TC-S-002 (launch_testing) |
-> | `CMakeLists.txt`, `package.xml` of autonomous_driving | how the nodes and the tests are registered |
-> | `results/` | evidence of every test case: test output, evaluation results, rosbags |
-> | `tools/save_evaluation.py` | helper that saves the evaluation result of one scenario run |
+> Worked example of Lecture 07 (lane keeping, LKS). Replace it with your own function, documents, code, tests, and results;
+> keep the table headers, rules, and folders of `CLAUDE.md`.
 
 ## Team
 | Student ID | Name | Role |
 |---|---|---|
+| 2026XXXXXX | Member A | perception (COMP-01) |
+| 2026XXXXXX | Member B | control (COMP-02) |
+| 2026XXXXXX | Member C | tests and documents |
 
 ## Topic
-<!-- One paragraph: what the function does and in which situation. Details in docs/00_overview.md. -->
+Lane keeping on the map easy: the vehicle follows the center of its lane at 10 m/s.
+The perception node fits the lane points to the driving way, and the control node follows it (pure pursuit) at the target speed.
+Details in [docs/00_overview.md](docs/00_overview.md).
 
 ## Build and Run
 Requires Ubuntu 22.04 on x86_64 (Intel/AMD PC or WSL2) and ROS 2 Humble. Apple Silicon Macs are not supported.
@@ -42,6 +35,8 @@ python3 tools/check_traceability.py
 <!-- Key results per system-level TC with links to results/. -->
 | TC-ID | Result | Evidence |
 |---|---|---|
+| TC-S-001 | Pass (3 of 3 runs) | [results/TC-S-001](results/TC-S-001/) |
+| TC-S-002 | Pass | [results/TC-S-002](results/TC-S-002/test_result.txt) |
 
 ## Documents
 - [Overview](docs/00_overview.md)
