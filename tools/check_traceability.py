@@ -4,14 +4,21 @@
 ID formats (Lecture 07, LKS example):
   SYS-001  SWR-001  COMP-01  IF-01  TC-U-001  TC-I-001  TC-S-001  RT-001  AN-001
 
+Each test level verifies the work product of its process (Lecture 07):
+  TC-U (SWE.4) verifies units of docs/04 (unit names)
+  TC-I (SWE.5) verifies components and interfaces of docs/03 (COMP, IF IDs)
+  TC-S (SWE.6) verifies software requirements of docs/02 (SWR IDs)
+
 Errors (exit 1):
   - a required file is missing, or a fixed table header was changed
   - an ID in the wrong format, or a duplicated ID
-  - an SWR without a source SYS, a COMP, or a test case
-  - a test case that verifies an unknown ID, or whose Result is not Pass / Fail / Not executed
+  - an SWR without a source SYS, a COMP, or a TC-S; a unit without a TC-U; a COMP or IF without a TC-I
+  - a unit in docs/03 that is not in docs/04 or the other way round, or a unit that implements an unknown SWR
+  - a test case that verifies something of another level or an unknown ID or unit,
+    or whose Result is not Pass / Fail / Not executed
   - a test report row or anomaly that refers to an unknown test case
-  - an @req / @verifies tag in code that is not defined in the docs
-  - docs/traceability.csv: wrong header, unknown ID, or a Result that differs from the test specification
+  - an @req / @verifies tag in code with an ID or unit that is not defined in the docs
+  - docs/traceability.csv: wrong header, unknown ID or unit, or a Result that differs from the test specification
 Warnings: the number of SWRs is outside 10 to 20.
 """
 import csv
@@ -36,7 +43,8 @@ ID_FORMAT = {
     "TC": r"TC-[UIS]-\d{3}", "RT": r"RT-\d{3}", "AN": r"AN-\d{3}",
 }
 ID_RE = re.compile(r"\b(?:" + "|".join(ID_FORMAT.values()) + r")\b")
-TAG_RE = re.compile(r"@(req|verifies)\s+((?:SWR-\d{3}[\s,]*)+)")
+TAG_RE = re.compile(r"@(req|verifies)[ \t]+([^\n]+)")
+WORD_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 CODE_SUFFIXES = {".cpp", ".hpp", ".h", ".c", ".py", ".xml"}
 RESULTS = {"Pass", "Fail", "Not executed"}
 
@@ -46,6 +54,8 @@ TABLES = {
             ["ID", 'Requirement ("The vehicle shall …")', "Verification Method", "Acceptance Criteria"]),
     "swr": ("02_sw_requirements.md",
             ["ID", "Requirement", "Source (SYS-ID)", "Priority", "Verification Method", "Acceptance Criteria"]),
+    "unit": ("04_detailed_design.md",
+             ["Unit", "File", "Input (format, unit)", "Output (format, unit)", "Implements (SWR-ID)"]),
     "comp": ("03_sw_architecture.md",
              ["ID", "Name", "Role", "Units (functions)", "Input", "Output", "Allocated SWR"]),
     "if": ("03_sw_architecture.md",
@@ -120,6 +130,7 @@ def main():
     tc_rows = check_ids(t["tc"], TABLES["tc"][0], ["TC", "RT"])
     report_rows = check_ids(t["report"], TABLES["report"][0], ["TC", "RT"])
     an_rows = check_ids(t["anomaly"], TABLES["anomaly"][0], ["AN"])
+    unit_rows = [r for r in t["unit"] if r["Unit"]]
 
     defined = {}
     for rows in (sys_rows, swr_rows, comp_rows, if_rows, tc_rows, an_rows):
@@ -132,6 +143,10 @@ def main():
     comp_ids = {r["ID"] for r in comp_rows}
     if_ids = {r["ID"] for r in if_rows}
     tc_ids = {r["ID"] for r in tc_rows}
+    unit_ids = {r["Unit"].strip("`") for r in unit_rows}
+
+    def units_in(text):
+        return {w for w in WORD_RE.findall(text) if w in unit_ids}
 
     # SYS -> SWR
     for r in swr_rows:
@@ -153,22 +168,62 @@ def main():
             for c in sorted(ids_in(r[col], "COMP") - comp_ids):
                 errors.append(f"{r['ID']}: {col.lower()} {c} is not defined")
 
-    # SWR -> test case -> result
-    verified = set()
+    # SWE.3: units of docs/04 <-> units of docs/03, unit -> SWR
+    comp_units = set()
+    for r in comp_rows:
+        comp_units |= {w for w in WORD_RE.findall(r["Units (functions)"])}
+    for u in sorted(unit_ids - comp_units):
+        errors.append(f"unit {u}: in docs/04 but not in the Units of any COMP in docs/03")
+    for u in sorted(comp_units - unit_ids):
+        errors.append(f"unit {u}: in docs/03 but not in docs/04")
+    for r in unit_rows:
+        swrs = ids_in(r["Implements (SWR-ID)"], "SWR")
+        if not swrs:
+            errors.append(f"unit {r['Unit']}: implements no SWR")
+        for s in sorted(swrs - swr_ids):
+            errors.append(f"unit {r['Unit']}: implements {s}, which is not defined")
+
+    # test cases: each level verifies the work product of its process
+    verified = {"SWR": set(), "COMP": set(), "IF": set(), "unit": set()}
     for r in tc_rows:
-        targets = ids_in(r["Verifies"], "SWR")
-        if not targets:
-            errors.append(f"{r['ID']}: verifies no SWR")
-        for s in sorted(ids_in(r["Verifies"], "SWR", "COMP", "IF") - swr_ids - comp_ids - if_ids):
-            errors.append(f"{r['ID']}: verifies undefined {s}")
-        verified |= targets
+        text, kind = r["Verifies"], r["ID"][:4]
+        swrs, archs, units = ids_in(text, "SWR"), ids_in(text, "COMP", "IF"), units_in(text)
+        for x in sorted(ids_in(text, "SWR", "COMP", "IF") - swr_ids - comp_ids - if_ids):
+            errors.append(f"{r['ID']}: verifies undefined {x}")
+        if kind == "TC-U":
+            if not units:
+                errors.append(f"{r['ID']}: a unit test verifies a unit of docs/04 (write its name in Verifies)")
+            if swrs or archs:
+                errors.append(f"{r['ID']}: a unit test verifies units only, not SWR, COMP, or IF IDs")
+            verified["unit"] |= units
+        elif kind == "TC-I":
+            if not archs:
+                errors.append(f"{r['ID']}: an integration test verifies COMP or IF IDs of docs/03")
+            if swrs or units:
+                errors.append(f"{r['ID']}: an integration test verifies COMP and IF IDs only, not SWRs or units")
+            verified["COMP"] |= ids_in(text, "COMP")
+            verified["IF"] |= ids_in(text, "IF")
+        elif kind == "TC-S":
+            if not swrs:
+                errors.append(f"{r['ID']}: a software test verifies SWR IDs of docs/02")
+            if archs or units:
+                errors.append(f"{r['ID']}: a software test verifies SWR IDs only, not COMP, IF, or units")
+            verified["SWR"] |= swrs
+        elif not (swrs or archs or units):
+            errors.append(f"{r['ID']}: verifies nothing (list what the re-run test cases verify)")
         if r["Result"] not in RESULTS:
             errors.append(f"{r['ID']}: Result must be Pass, Fail, or Not executed (got '{r['Result']}')")
-    for s in sorted(swr_ids):
-        if s not in allocated:
-            errors.append(f"{s}: not allocated to any COMP")
-        if s not in verified:
-            errors.append(f"{s}: not verified by any test case")
+    for x in sorted(swr_ids):
+        if x not in allocated:
+            errors.append(f"{x}: not allocated to any COMP")
+        if x not in verified["SWR"]:
+            errors.append(f"{x}: not verified by any software test (TC-S)")
+    for x in sorted(comp_ids - verified["COMP"]):
+        errors.append(f"{x}: not verified by any integration test (TC-I)")
+    for x in sorted(if_ids - verified["IF"]):
+        errors.append(f"{x}: not verified by any integration test (TC-I)")
+    for u in sorted(unit_ids - verified["unit"]):
+        errors.append(f"unit {u}: not verified by any unit test (TC-U)")
 
     # test report and anomalies refer to defined test cases
     for r in report_rows:
@@ -190,8 +245,15 @@ def main():
         for p in (ROOT / base).rglob("*"):
             if p.suffix in CODE_SUFFIXES and p.is_file():
                 for m in TAG_RE.finditer(p.read_text(encoding="utf-8", errors="ignore")):
-                    for s in sorted(ids_in(m.group(2), "SWR") - swr_ids):
-                        errors.append(f"{p.relative_to(ROOT)}: @{m.group(1)} {s} is not defined in docs")
+                    tag, text = m.group(1), m.group(2)
+                    where = f"{p.relative_to(ROOT)}: @{tag}"
+                    found = ids_in(text, "SWR", "COMP", "IF")
+                    for x in sorted(found - swr_ids - comp_ids - if_ids):
+                        errors.append(f"{where} {x} is not defined in docs")
+                    if tag == "req" and not ids_in(text, "SWR"):
+                        errors.append(f"{where} names no SWR")
+                    if tag == "verifies" and not (found or units_in(text)):
+                        errors.append(f"{where} names no SWR, COMP, IF, or unit of the docs")
 
     # traceability.csv (13-51 Consistency Evidence)
     with open(DOCS / "traceability.csv", newline="", encoding="utf-8") as f:
@@ -205,6 +267,9 @@ def main():
                 for m in ID_RE.finditer(row.get(col, "")):
                     if m.group(0) not in defined:
                         errors.append(f"docs/traceability.csv line {i}: {m.group(0)} is not defined")
+            unit = row.get("Unit", "")
+            if unit and unit not in unit_ids:
+                errors.append(f"docs/traceability.csv line {i}: unit {unit} is not in docs/04")
             tcs = ids_in(row.get("TC-ID", ""), "TC", "RT")
             if len(tcs) == 1 and row.get("Result"):
                 tc = next(iter(tcs))
@@ -213,7 +278,7 @@ def main():
 
     if swr_ids and not 10 <= len(swr_ids) <= 20:
         warnings.append(f"{len(swr_ids)} SWRs defined (expected 10 to 20)")
-    print(f"SYS {len(sys_ids)}, SWR {len(swr_ids)}, COMP {len(comp_ids)}, IF {len(if_ids)}, "
+    print(f"SYS {len(sys_ids)}, SWR {len(swr_ids)}, COMP {len(comp_ids)}, IF {len(if_ids)}, units {len(unit_ids)}, "
           f"test cases {len(tc_ids)}, anomalies {len(an_rows)}")
 
 
