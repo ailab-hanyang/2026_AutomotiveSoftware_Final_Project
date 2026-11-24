@@ -65,11 +65,6 @@ class AutonomousDriving : public rclcpp::Node {
             i_lane_points_ = ros2_bridge::GetLanePoints(*msg);
             b_is_lane_points_ = true;
         }
-        inline void CallbackLanePointsArray(const ad_msgs::msg::LanePointDataArray::SharedPtr msg) {            
-            std::lock_guard<std::mutex> lock(mutex_lane_points_array_);
-            i_lane_points_array_ = ros2_bridge::GetLanePointsArray(*msg);
-            b_is_lane_points_array_ = true;
-        }
         inline void CallbackMission(const ad_msgs::msg::Mission::SharedPtr msg) {
             std::lock_guard<std::mutex> lock(mutex_mission_);
             i_mission_ = ros2_bridge::GetMission(*msg);
@@ -89,21 +84,18 @@ class AutonomousDriving : public rclcpp::Node {
         rclcpp::Subscription<ad_msgs::msg::VehicleCommand>::SharedPtr       s_manual_input_;
         rclcpp::Subscription<ad_msgs::msg::VehicleState>::SharedPtr         s_vehicle_state_;
         rclcpp::Subscription<ad_msgs::msg::LanePointData>::SharedPtr        s_lane_points_;
-        rclcpp::Subscription<ad_msgs::msg::LanePointDataArray>::SharedPtr   s_lane_points_array_;
         rclcpp::Subscription<ad_msgs::msg::Mission>::SharedPtr              s_mission_;
         
         // Input
         interface::VehicleCommand   i_manual_input_;
         interface::VehicleState     i_vehicle_state_;
         interface::Lane             i_lane_points_;
-        interface::Lanes            i_lane_points_array_;
         interface::Mission          i_mission_;
 
         // Mutex
         std::mutex mutex_manual_input_;
         std::mutex mutex_vehicle_state_;
         std::mutex mutex_lane_points_;
-        std::mutex mutex_lane_points_array_;
         std::mutex mutex_mission_;
 
         // Publisher
@@ -121,7 +113,6 @@ class AutonomousDriving : public rclcpp::Node {
         bool b_is_manual_input_ = false;
         bool b_is_simulator_on_ = false;
         bool b_is_lane_points_ = false;
-        bool b_is_lane_points_array_ = false;
         bool b_is_mission_ = false;
 };
 
