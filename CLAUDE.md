@@ -37,9 +37,10 @@ resources/                    lane CSV files per map (resources/csv/<map>/), mes
 docs/                         V-process documents (fixed format, see below)
 test/unit/                    SWE.4 unit tests, gtest (TC-U-xxx)
 test/integration/             SWE.5 integration tests, launch_testing (TC-I-xxx)
-test/scenario/                SWE.6 scenario tests judged by the evaluation node (TC-S-xxx)
+test/scenario/                SWE.6 software tests (TC-S-xxx): simulator scenarios, and the whole software with injected inputs
 results/                      verification data per test case (results/TC-S-001/): logs, rosbag, evaluation logs, videos
 tools/check_traceability.py   format and traceability check
+tools/save_evaluation.py      saves the evaluation result of one scenario run (TC-S)
 ```
 - The `.a` files in the provided packages are prebuilt libraries. Treat them as a black box: do not modify, replace, or decompile them.
   They are built for x86_64 only (`<name>.x86_64.a`).
@@ -51,13 +52,14 @@ tools/check_traceability.py   format and traceability check
 | `/manual_input` | `ad_msgs/msg/VehicleCommand` | subscribe (manual driving only, global name) |
 | `vehicle_state` | `ad_msgs/msg/VehicleState` | subscribe |
 | `lane_points` | `ad_msgs/msg/LanePointData` | subscribe |
-| `lane_points_array` | `ad_msgs/msg/LanePointDataArray` | subscribe |
 | `mission` | `ad_msgs/msg/Mission` | subscribe |
 | `vehicle_command` | `ad_msgs/msg/VehicleCommand` | publish |
 | `driving_way` | `ad_msgs/msg/PolyfitLaneData` | publish (visualization) |
 | `poly_lanes` | `ad_msgs/msg/PolyfitLaneDataArray` | publish (visualization) |
 
 Read the `.msg` files in `src/rte/msg/ad_msgs/msg/` for fields and units before using a topic.
+Subscribe only to the topics in this table. The simulator also publishes `ROI_lanes` and `csv_lanes` for the RViz display;
+team code must not use them: the lanes are detected from `lane_points` by the team.
 
 ## Maps and missions
 Three maps (3 lanes, 4 m wide, start at the origin heading +x): `easy` (875 m), `normal` (1065 m), `hard` (1100 m).
@@ -75,7 +77,66 @@ The positions and parameters of the missions are fixed per map. A team only choo
 
 Fixed for every team (not configurable): lane detection ROI (front 20 m, rear 5 m, left and right 4 m, noise 0.1 m),
 detection range of mission objects (20 m), lane departure threshold (4.5 m), time limit (`easy` 180 s, `normal` 230 s, `hard` 250 s).
-Every scenario test (`TC-S`) states the map and the switches in `Input / Scenario`, so that it can be re-run the same way.
+Every simulator scenario (`TC-S`) states the map and the switches in `Input / Scenario`, so that it can be re-run the same way.
+
+## Units, tests, and evidence (SWE.3 to SWE.6)
+### What each test level verifies
+Each level checks the work product of its own process (Lecture 07). The `Verifies` column of `docs/05` and the
+`@verifies` tag of the test name the same items.
+
+| Level | Process | Verifies | Coverage (checked by `tools/check_traceability.py`) |
+|---|---|---|---|
+| `TC-U` unit test | SWE.4 | units of `docs/04`, by name | every unit has a TC-U |
+| `TC-I` integration test | SWE.5 | components and interfaces of `docs/03` (`COMP-01`, `IF-01`) | every COMP and IF has a TC-I |
+| `TC-S` software test | SWE.6 | software requirements of `docs/02` (`SWR-001`) | every SWR has a TC-S |
+
+So the Verification Method of an SWR is always a software test on the whole software: a simulator scenario,
+data recorded in a scenario run, or the whole software with injected inputs. Unit and integration tests check the design.
+
+### Units (SWE.3)
+- A unit is one function listed in `docs/04_detailed_design.md`, with `// @req SWR-xxx` on the line above it.
+- Keep units free of ROS code (e.g. `src/<node>/<node>_algorithm.cpp`, one folder per node as in the provided `simulator` package),
+  so that a gtest can call them without ROS.
+  The node file only subscribes, calls the units, and publishes.
+- Put the default parameter values in one config header; the node declares its ROS parameters with these values,
+  and `docs/04` lists each parameter with its value, unit, and file.
+- `docs/04` gives the valid range and the physical unit of every input and output of a unit, and its preconditions.
+
+### Registering tests (SWE.4 to SWE.6)
+A test file in `test/` runs only if a team package registers it. In the `CMakeLists.txt` of that package:
+```cmake
+if(BUILD_TESTING)
+  set(REPO_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../..)    # repository root, for a package in src/app/<package>
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(test_lane_detection ${REPO_ROOT}/test/unit/test_lane_detection.cpp)
+  target_link_libraries(test_lane_detection lane_detection_algorithm)   # library with the units under test
+  find_package(launch_testing_ament_cmake REQUIRED)
+  add_launch_test(${REPO_ROOT}/test/integration/test_control_io.py TARGET test_control_io TIMEOUT 60)
+endif()
+```
+In `package.xml`: `<test_depend>` for `ament_cmake_gtest`, `launch_testing_ament_cmake`, `launch_ros`, and `rclpy`.
+After `colcon test`, check that every test case appears in `colcon test-result --verbose`:
+a test file that is not registered never runs and never fails.
+- Unit tests (gtest) call one unit with input values: normal, boundary, and invalid inputs.
+- Integration tests (launch_testing) start the nodes under test without the simulator,
+  publish fake inputs from the test, and check the output topics.
+
+### Software tests (SWE.6)
+- A simulator scenario: run it 3 times with the map and switches of its `Input / Scenario`. It passes only if all 3 runs pass.
+- A test of the whole software with injected inputs (all team nodes started by launch_testing, fake simulator topics)
+  covers what the simulator cannot create, e.g. an invalid speed (negative test). Keep it in `test/scenario/`
+  and register it with `add_launch_test`.
+- After each run, while the evaluation node is still running: `python3 tools/save_evaluation.py TC-S-001`
+  saves `results/TC-S-001/run_<n>.txt` with the time and the git commit.
+- A criterion the evaluation node does not judge (e.g. speed) needs recorded data:
+  `ros2 bag record -o results/TC-S-001/rosbag/run_<n> <topics>`, checked by a script kept in `test/scenario/`.
+
+### Evidence and regression
+- `results/<test case ID>/` holds the evidence of each test case: for TC-U and TC-I the lines of
+  `colcon test-result --verbose`, with the date and the git commit; for TC-S the files above.
+  `docs/06_test_report.md` cites the path.
+- After a change to code or parameters that a passed test case covers, re-run the affected test cases,
+  add an `RT-xxx` row to `docs/05` that names them and the change, and update the evidence and the results.
 
 ## V-process documents
 | File | Content | IDs |
@@ -101,11 +162,12 @@ Where each process lives and which gate covers it (Lecture 07):
 | SWE.6 | Does the software meet the SWRs? | `docs/05_test_specification.md`, `docs/06_test_report.md`, `test/scenario` | `final` |
 
 Rules:
-- ID formats: `SYS-001`, `SWR-001`, `COMP-01`, `IF-01`, `TC-U-001` (unit), `TC-I-001` (integration), `TC-S-001` (scenario), `RT-001` (regression), `AN-001` (anomaly).
+- ID formats: `SYS-001`, `SWR-001`, `COMP-01`, `IF-01`, `TC-U-001` (unit), `TC-I-001` (integration), `TC-S-001` (software test), `RT-001` (regression), `AN-001` (anomaly).
   Never reuse or renumber an ID; mark removed items as removed instead.
 - Do not change the table headers. The check script and the grading tools parse them.
 - Every requirement is testable: write a quantitative acceptance criterion with units.
-- Every SWR has a source SYS, at least one COMP in `Allocated SWR`, and at least one TC in `Verifies`.
+- Every SWR has a source SYS, at least one COMP in `Allocated SWR`, and at least one TC-S that verifies it.
+  Every unit in `docs/04` has a TC-U, and every COMP and IF in `docs/03` has a TC-I.
 - Every test case has a `Result`: `Pass`, `Fail`, or `Not executed`. Once it is run, `docs/06_test_report.md` gives the same result and an evidence path.
 - Every failure gets an anomaly (`AN-xxx`) with root cause, action, and status in `docs/06_test_report.md`.
 - Reviews are Pull Requests merged before the gate tag; link them in the `Review` sections.
@@ -115,13 +177,15 @@ Rules:
 
 ## Traceability tags
 - Code that implements a requirement: `// @req SWR-012` on the line above the function.
-- Tests: `// @verifies SWR-012` (`# @verifies SWR-012` in Python), and the test case ID in the test name, e.g. `TEST(LaneDetection, TC_U_003_RightLaneOnly)`.
+- Tests: `// @verifies` (`# @verifies` in Python) with what the test case verifies: the unit name for a TC-U
+  (`// @verifies LaneDetection`), COMP and IF IDs for a TC-I (`# @verifies COMP-02, IF-04`), SWR IDs for a TC-S (`# @verifies SWR-012`);
+  and the test case ID in the test name, e.g. `TEST(LaneDetection, TC_U_003_RightLaneOnly)`.
 - Commits: start the message with `[SWR-012]` or a test case ID such as `[TC-U-003]`.
 - PRs: fill in `.github/PULL_REQUEST_TEMPLATE.md`; the related SWR and test case IDs are required.
 
 ## Before you finish a change
 1. `colcon build` passes without new warnings in team packages.
-2. `colcon test` passes.
+2. `colcon test` passes, and every test case in `docs/05` that runs with `colcon test` appears in `colcon test-result --verbose`.
 3. `python3 tools/check_traceability.py` prints `OK`.
 4. Docs, tags, and `docs/traceability.csv` match the code (the same result for a test case everywhere).
 
