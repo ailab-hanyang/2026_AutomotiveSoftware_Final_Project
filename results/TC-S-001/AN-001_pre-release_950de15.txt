@@ -1,0 +1,24 @@
+AN-001 supporting data: rosbag check of a pre-release run of TC-S-001 on commit 950de15
+(the same code before the files were moved into one folder per node; the rosbags of this run are not kept)
+
+
+run_1
+speed from 10.0 s after the start to the track end (88.6 s): min 9.89 m/s, max 9.89 m/s -> Pass
+timing perception: 9346 periods of 10.0 ms, longest 3.707 ms, 0 over the period -> Pass
+timing control: 9253 periods of 10.0 ms, longest 1.608 ms, 0 over the period -> Pass
+command: 9253 vehicle commands, 0 with accel or brake outside [0, 1] -> Pass
+TC-S-001 rosbag criteria: Pass
+
+run_2
+speed from 10.0 s after the start to the track end (88.6 s): min 9.89 m/s, max 9.89 m/s -> Pass
+timing perception: 9858 periods of 10.0 ms, longest 324.526 ms, 2 over the period -> Fail
+timing control: 9767 periods of 10.0 ms, longest 325.018 ms, 1 over the period -> Fail
+command: 9767 vehicle commands, 0 with accel or brake outside [0, 1] -> Pass
+TC-S-001 rosbag criteria: Fail
+
+run_3
+speed from 10.0 s after the start to the track end (88.6 s): min 9.89 m/s, max 9.89 m/s -> Pass
+timing perception: 9229 periods of 10.0 ms, longest 2.625 ms, 0 over the period -> Pass
+timing control: 9168 periods of 10.0 ms, longest 12.154 ms, 1 over the period -> Fail
+command: 9168 vehicle commands, 0 with accel or brake outside [0, 1] -> Pass
+TC-S-001 rosbag criteria: Fail

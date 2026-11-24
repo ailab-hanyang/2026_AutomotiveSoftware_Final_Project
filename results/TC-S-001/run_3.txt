@@ -1,0 +1,34 @@
+test case: TC-S-001
+run: 3
+saved: 2026-11-24 09:49:27
+git commit: 05fe1e7
+
+
+///////////////////////////////////////////////////
+/////////////// [Evaluation Result] ///////////////
+1. Limit Speed:		33.3333 m/s
+   Vehicle Speed:	9.89235 m/s
+   ------------------------------------------------
+   Over Speed Penalty:	0 sec
+
+===================================================
+2. Cross Track Error:		0.0445375 m
+   Lane Departure Threshold:	4.5 m
+   Max Cross Track Error:	0.327508 m
+
+===================================================
+3. Driving Time:	94.3432 sec
+   Time Limit:		180 sec
+
+===================================================
+4. Failure:
+   Time Limit:		SUCCESS
+   Lane Departure:	SUCCESS
+   Collision:		SUCCESS
+
+
+------------------- [Result] ----------------------
+Time Score:	94.3432
+Failure:	SUCCESS
+Parking : -
+///////////////////////////////////////////////////

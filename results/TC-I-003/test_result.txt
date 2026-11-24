@@ -1,0 +1,10 @@
+test case: TC-I-003
+command: colcon test && colcon test-result --verbose (repository root)
+run: 2026-11-24 09:43, git commit: 05fe1e7
+
+ok  test_perception_control    test_tc_i_003_computation_time
+
+TC-I-003 perception: 1102 periods of 10.0 ms, longest 0.457 ms
+TC-I-003 control: 1102 periods of 10.0 ms, longest 0.271 ms
+
+Summary: 19 tests, 0 errors, 0 failures, 0 skipped

@@ -32,6 +32,8 @@ Software test (injected inputs). Unit and integration tests verify the design (`
 ### Risks
 - Only the map easy is in scope. On the tight curves of `normal` and `hard`, splitting the lane points by the sign of y can put points on the wrong lane.
 - Lane loss (`LANE_LOSS`) is not handled: without lane points the driving way is not valid. It is out of scope (`00_overview.md`).
+- SWR-003 on a PC without a real-time operating system: a node can be delayed by the operating system, so a period can exceed 10 ms
+  even when the computation itself is short (AN-001).
 
 ## Review
 Requirements are reviewed in a Pull Request and merged before the tag `req-v1`.

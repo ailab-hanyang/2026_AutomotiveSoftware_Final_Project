@@ -35,7 +35,7 @@ python3 tools/check_traceability.py
 <!-- Key results per system-level TC with links to results/. -->
 | TC-ID | Result | Evidence |
 |---|---|---|
-| TC-S-001 | Pass (3 of 3 runs) | [results/TC-S-001](results/TC-S-001/) |
+| TC-S-001 | Fail: one period over 10 ms in run 3 (AN-001); lane keeping, speed, and commands met in 3 of 3 runs | [results/TC-S-001](results/TC-S-001/) |
 | TC-S-002 | Pass | [results/TC-S-002](results/TC-S-002/test_result.txt) |
 
 ## Documents

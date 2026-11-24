@@ -1,0 +1,7 @@
+test case: TC-I-004
+command: colcon test && colcon test-result --verbose (repository root)
+run: 2026-11-24 09:43, git commit: 05fe1e7
+
+ok  test_perception_io         test_tc_i_004_driving_way_from_lane_points
+
+Summary: 19 tests, 0 errors, 0 failures, 0 skipped
