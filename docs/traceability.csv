@@ -1,1 +1,16 @@
 SYS-ID,SWR-ID,COMP-ID,IF-ID,Unit,TC-ID,Result,Owner
+SYS-001,SWR-001,COMP-01,IF-02,FindDrivingWay,TC-U-001,Pass,Member B
+SYS-001,SWR-001,COMP-01,IF-03,FindDrivingWay,TC-I-004,Pass,Member B
+SYS-001,SWR-001,COMP-02,IF-04,LateralControl,TC-U-004,Pass,Member B
+SYS-001,SWR-001,COMP-02,IF-04,LateralControl,TC-I-001,Pass,Member B
+SYS-001,SWR-001,COMP-02,IF-04,LateralControl,TC-S-001,Pass,Member B
+SYS-001,SWR-002,COMP-02,IF-04,LongitudinalControl,TC-U-003,Pass,Member B
+SYS-001,SWR-002,COMP-02,IF-04,LongitudinalControl,TC-S-001,Pass,Member B
+SYS-001,SWR-003,COMP-01,IF-05,,TC-I-003,Pass,Member A
+SYS-001,SWR-003,COMP-02,IF-06,,TC-I-003,Pass,Member A
+SYS-001,SWR-003,COMP-01,IF-05,,TC-S-001,Pass,Member A
+SYS-001,SWR-003,COMP-02,IF-06,,TC-S-001,Pass,Member A
+SYS-001,SWR-004,COMP-02,IF-04,LongitudinalControl,TC-U-002,Pass,Member C
+SYS-001,SWR-004,COMP-02,IF-04,LongitudinalControl,TC-I-002,Pass,Member C
+SYS-001,SWR-004,COMP-02,IF-04,LongitudinalControl,TC-S-001,Pass,Member C
+SYS-001,SWR-004,COMP-02,IF-04,LongitudinalControl,TC-S-002,Pass,Member C

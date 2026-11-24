@@ -5,3 +5,4 @@ Each SYS is refined into SWRs in `02_sw_requirements.md`.
 
 | ID | Requirement ("The vehicle shall …") | Verification Method | Acceptance Criteria |
 |---|---|---|---|
+| SYS-001 | The vehicle shall stay within its lane. | Scenario test (evaluation node) | `Lane Departure: SUCCESS` in the evaluation result on the map easy |

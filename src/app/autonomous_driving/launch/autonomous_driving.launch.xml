@@ -2,11 +2,18 @@
 <launch>
     <arg name="ns1" default="ego"/>
     <arg name="loop_rate_hz" default="100.0"/>
-    <arg name="use_manual_inputs" default="true" />
+    <!-- Both nodes always run. manual:=false (default): control sends its own command.
+         manual:=true: control passes /manual_input through (start manual_driving.launch.xml for the keyboard input). -->
+    <arg name="manual" default="false"/>
 
-    <node pkg="autonomous_driving" exec="autonomous_driving" name="autonomous_driving" namespace="$(var ns1)" output="screen">
-        <param name="autonomous_driving/ns" value="$(var ns1)"/>
-        <param name="autonomous_driving/loop_rate_hz" value="$(var loop_rate_hz)"/>
-        <param name="autonomous_driving/use_manual_inputs" value="$(var use_manual_inputs)"/>
+    <node pkg="autonomous_driving" exec="perception" name="perception" namespace="$(var ns1)" output="screen">
+        <param name="perception/ns" value="$(var ns1)"/>
+        <param name="perception/loop_rate_hz" value="$(var loop_rate_hz)"/>
+    </node>
+    <node pkg="autonomous_driving" exec="control" name="control" namespace="$(var ns1)" output="screen">
+        <param name="control/ns" value="$(var ns1)"/>
+        <param name="control/loop_rate_hz" value="$(var loop_rate_hz)"/>
+        <param name="control/target_speed" value="10.0"/>
+        <param name="control/use_manual_inputs" value="$(var manual)"/>
     </node>
 </launch>

@@ -32,26 +32,29 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/../../bsw/system/bridge
 )
 
-## Declare a C++ executable
-add_executable(${PROJECT_NAME}
-    src/autonomous_driving_node.cpp
-)
+## Units (calculation functions without ROS): libraries that the nodes and the unit tests both use
+add_library(perception_algorithm STATIC src/perception/perception_algorithm.cpp)
+add_library(control_algorithm STATIC src/control/control_algorithm.cpp)
 
-## Link libraries to the executable
-target_link_libraries(${PROJECT_NAME}
-)
+## COMP-01 perception and COMP-02 control: one executable per node, one folder per node in include/ and src/
+add_executable(perception src/perception/perception_node.cpp)
+target_link_libraries(perception perception_algorithm)
+add_executable(control src/control/control_node.cpp)
+target_link_libraries(control control_algorithm)
 
-## Add dependencies to the executable
-ament_target_dependencies(${PROJECT_NAME}
-    rclcpp
-    std_msgs
-    ad_msgs
-    tf2
-    tf2_ros
-)
+## Add dependencies to the executables
+foreach(target perception control)
+  ament_target_dependencies(${target}
+      rclcpp
+      std_msgs
+      ad_msgs
+      tf2
+      tf2_ros
+  )
+endforeach()
 
 ## Install the executable
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS perception control
     DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY launch
@@ -65,4 +68,41 @@ install(PROGRAMS
 ################################################################################
 # Find and load build settings from external packages
 ################################################################################
+## Tests: files in test/ at the repository root, registered here so that colcon test runs them
+if(BUILD_TESTING)
+  set(REPO_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../..)
+
+  # SWE.4 unit tests (gtest): one ament_add_gtest per test file in test/unit/
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(test_perception_algorithm
+      ${REPO_ROOT}/test/unit/test_perception_algorithm.cpp
+  )
+  target_link_libraries(test_perception_algorithm perception_algorithm)
+  ament_add_gtest(test_control_algorithm
+      ${REPO_ROOT}/test/unit/test_control_algorithm.cpp
+  )
+  target_link_libraries(test_control_algorithm control_algorithm)
+
+  # SWE.5 integration tests (launch_testing): one add_launch_test per test file in test/integration/
+  find_package(launch_testing_ament_cmake REQUIRED)
+  add_launch_test(${REPO_ROOT}/test/integration/test_control_io.py
+      TARGET test_control_io
+      TIMEOUT 60
+  )
+  add_launch_test(${REPO_ROOT}/test/integration/test_perception_control.py
+      TARGET test_perception_control
+      TIMEOUT 90
+  )
+  add_launch_test(${REPO_ROOT}/test/integration/test_perception_io.py
+      TARGET test_perception_io
+      TIMEOUT 60
+  )
+
+  # SWE.6 software tests with injected inputs (launch_testing): one add_launch_test per test file in test/scenario/
+  add_launch_test(${REPO_ROOT}/test/scenario/test_invalid_speed.py
+      TARGET test_invalid_speed
+      TIMEOUT 60
+  )
+endif()
+
 ament_package()
